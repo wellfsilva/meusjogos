@@ -1,66 +1,76 @@
-    let allGames = [];
+ async function loadGames() {
+      const response = await fetch('games.json');
+      const games = await response.json();
 
-    fetch('games.json')
-      .then(r => r.json())
-      .then(games => {
-        allGames = games;
-        popularFiltros(games);
-        renderizar(games);
-      });
+      const container = document.getElementById('gamesContainer');
+      const platformFilter = document.getElementById('platformFilter');
+      const genreFilter = document.getElementById('genreFilter');
+      const searchInput = document.getElementById('searchInput');
 
-    function renderizar(games) {
-      const container = document.getElementById('games-container');
-      container.innerHTML = '';
+      const allPlatforms = new Set();
+      const allGenres = new Set();
+
+      function renderGames() {
+        const search = searchInput.value.toLowerCase();
+        const selectedPlatform = platformFilter.value;
+        const selectedGenre = genreFilter.value;
+
+        container.innerHTML = '';
+
+        games.forEach(game => {
+          const name = game.Name || '';
+          const platform = game.Platforms?.[0]?.Name || '';
+          const genres = game.Genres?.map(g => g.Name).join(', ') || '';
+          const source = game.Source?.Name || '';
+          const cover = game.CoverImage || '';
+
+          if (
+            (!search || name.toLowerCase().includes(search)) &&
+            (!selectedPlatform || platform === selectedPlatform) &&
+            (!selectedGenre || genres.includes(selectedGenre))
+          ) {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+              <img src="${cover}" alt="${name}" onerror="this.src='placeholder.jpg'">
+              <h3>${name}</h3>
+              <p><strong>Plataforma:</strong> ${platform}</p>
+              <p><strong>Gênero:</strong> ${genres}</p>
+              <p><strong>Fonte:</strong> ${source}</p>
+            `;
+            container.appendChild(card);
+          }
+        });
+      }
+
       games.forEach(game => {
-        const div = document.createElement('div');
-        div.className = 'game';
-        div.innerHTML = `
-          <img src="${game.CoverImage}" alt="${game.Name}" />
-          <h3>${game.Name}</h3>
-          <p><strong>Plataforma:</strong> ${game.Platforms || 'N/A'}</p>
-          <p><strong>Gênero:</strong> ${game.Genres || 'N/A'}</p>
-        `;
-        container.appendChild(div);
+        if (game.Platforms?.length) {
+          allPlatforms.add(game.Platforms[0].Name);
+        }
+        if (game.Genres?.length) {
+          game.Genres.forEach(g => allGenres.add(g.Name));
+        }
       });
+
+      allPlatforms.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p;
+        option.textContent = p;
+        platformFilter.appendChild(option);
+      });
+
+      allGenres.forEach(g => {
+        const option = document.createElement('option');
+        option.value = g;
+        option.textContent = g;
+        genreFilter.appendChild(option);
+      });
+
+      platformFilter.addEventListener('change', renderGames);
+      genreFilter.addEventListener('change', renderGames);
+      searchInput.addEventListener('input', renderGames);
+
+      renderGames();
     }
 
-    function popularFiltros(games) {
-      const plataformas = [...new Set(games.map(g => g.Platforms).filter(Boolean))];
-      const generos = [...new Set(games.map(g => g.Genres).filter(Boolean))];
-
-      const plataformaSelect = document.getElementById('plataformaSelect');
-      const generoSelect = document.getElementById('generoSelect');
-
-      plataformas.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p;
-        opt.textContent = p;
-        plataformaSelect.appendChild(opt);
-      });
-
-      generos.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g;
-        opt.textContent = g;
-        generoSelect.appendChild(opt);
-      });
-    }
-
-    document.getElementById('searchInput').addEventListener('input', filtrar);
-    document.getElementById('plataformaSelect').addEventListener('change', filtrar);
-    document.getElementById('generoSelect').addEventListener('change', filtrar);
-
-    function filtrar() {
-      const busca = document.getElementById('searchInput').value.toLowerCase();
-      const plataforma = document.getElementById('plataformaSelect').value;
-      const genero = document.getElementById('generoSelect').value;
-
-      const filtrados = allGames.filter(g => {
-        const matchNome = g.Name.toLowerCase().includes(busca);
-        const matchPlataforma = !plataforma || g.Platforms === plataforma;
-        const matchGenero = !genero || g.Genres === genero;
-        return matchNome && matchPlataforma && matchGenero;
-      });
-
-      renderizar(filtrados);
-    }
+    loadGames();
