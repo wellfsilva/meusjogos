@@ -25,11 +25,13 @@ jobs:
         run: |
           python atualizar_capas_igdb.py
 
-      - name: Commit & Push do arquivo atualizado
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add games_atualizado_com_capas.json
-          git commit -m "Atualiza capas com IGDB" || echo "Sem mudanças"
-          git push
+     - name: Commit & Push do arquivo atualizado
+  env:
+    GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  run: |
+    git config user.name "github-actions"
+    git config user.email "github-actions@github.com"
+    git add games_atualizado_com_capas.json
+    git commit -m "Atualiza capas com IGDB" || echo "Sem mudanças"
+    git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
 
