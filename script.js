@@ -1,4 +1,4 @@
-  let allGames = [];
+    let allGames = [];
 
     fetch('games.json')
       .then(r => r.json())
@@ -17,16 +17,16 @@
         div.innerHTML = `
           <img src="${game.CoverImage}" alt="${game.Name}" />
           <h3>${game.Name}</h3>
-          <p><strong>Plataforma:</strong> ${game.Platform || 'N/A'}</p>
-          <p><strong>Gênero:</strong> ${game.Genre || 'N/A'}</p>
+          <p><strong>Plataforma:</strong> ${game.Platforms || 'N/A'}</p>
+          <p><strong>Gênero:</strong> ${game.Genres || 'N/A'}</p>
         `;
         container.appendChild(div);
       });
     }
 
     function popularFiltros(games) {
-      const plataformas = [...new Set(games.map(g => g.Platform).filter(Boolean))];
-      const generos = [...new Set(games.map(g => g.Genre).filter(Boolean))];
+      const plataformas = [...new Set(games.map(g => g.Platforms).filter(Boolean))];
+      const generos = [...new Set(games.map(g => g.Genres).filter(Boolean))];
 
       const plataformaSelect = document.getElementById('plataformaSelect');
       const generoSelect = document.getElementById('generoSelect');
@@ -57,8 +57,8 @@
 
       const filtrados = allGames.filter(g => {
         const matchNome = g.Name.toLowerCase().includes(busca);
-        const matchPlataforma = !plataforma || g.Platform === plataforma;
-        const matchGenero = !genero || g.Genre === genero;
+        const matchPlataforma = !plataforma || g.Platforms === plataforma;
+        const matchGenero = !genero || g.Genres === genero;
         return matchNome && matchPlataforma && matchGenero;
       });
 
