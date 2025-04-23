@@ -1,29 +1,66 @@
-fetch('games.json')
-  .then(response => response.json())
-  .then(games => {
-    const container = document.getElementById('games-container');
+  let allGames = [];
 
-    games.forEach(game => {
-      const gameDiv = document.createElement('div');
-      gameDiv.className = 'game';
+    fetch('games.json')
+      .then(r => r.json())
+      .then(games => {
+        allGames = games;
+        popularFiltros(games);
+        renderizar(games);
+      });
 
-      const title = document.createElement('h3');
-      title.textContent = game.Name;
+    function renderizar(games) {
+      const container = document.getElementById('games-container');
+      container.innerHTML = '';
+      games.forEach(game => {
+        const div = document.createElement('div');
+        div.className = 'game';
+        div.innerHTML = `
+          <img src="${game.CoverImage}" alt="${game.Name}" />
+          <h3>${game.Name}</h3>
+          <p><strong>Plataforma:</strong> ${game.Platform || 'N/A'}</p>
+          <p><strong>Gênero:</strong> ${game.Genre || 'N/A'}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
 
-      const img = document.createElement('img');
-      if (game.CoverImage) {
-        img.src = game.CoverImage;
-        img.alt = game.Name;
-      } else {
-        img.src = 'https://placehold.co/160x220';
-        img.alt = 'Capa não disponível';
-      }
+    function popularFiltros(games) {
+      const plataformas = [...new Set(games.map(g => g.Platform).filter(Boolean))];
+      const generos = [...new Set(games.map(g => g.Genre).filter(Boolean))];
 
-      gameDiv.appendChild(img);
-      gameDiv.appendChild(title);
-      container.appendChild(gameDiv);
-    });
-  })
-  .catch(err => {
-    console.error('Erro ao carregar o JSON:', err);
-  });
+      const plataformaSelect = document.getElementById('plataformaSelect');
+      const generoSelect = document.getElementById('generoSelect');
+
+      plataformas.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        plataformaSelect.appendChild(opt);
+      });
+
+      generos.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        generoSelect.appendChild(opt);
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filtrar);
+    document.getElementById('plataformaSelect').addEventListener('change', filtrar);
+    document.getElementById('generoSelect').addEventListener('change', filtrar);
+
+    function filtrar() {
+      const busca = document.getElementById('searchInput').value.toLowerCase();
+      const plataforma = document.getElementById('plataformaSelect').value;
+      const genero = document.getElementById('generoSelect').value;
+
+      const filtrados = allGames.filter(g => {
+        const matchNome = g.Name.toLowerCase().includes(busca);
+        const matchPlataforma = !plataforma || g.Platform === plataforma;
+        const matchGenero = !genero || g.Genre === genero;
+        return matchNome && matchPlataforma && matchGenero;
+      });
+
+      renderizar(filtrados);
+    }
