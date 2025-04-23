@@ -1,76 +1,87 @@
- async function loadGames() {
-      const response = await fetch('games.json');
-      const games = await response.json();
+ const games = []; // Essa variável será preenchida com os dados JSON
 
-      const container = document.getElementById('gamesContainer');
-      const platformFilter = document.getElementById('platformFilter');
-      const genreFilter = document.getElementById('genreFilter');
-      const searchInput = document.getElementById('searchInput');
+    const searchInput = document.getElementById('searchInput');
+    const platformFilter = document.getElementById('platformFilter');
+    const genreFilter = document.getElementById('genreFilter');
+    const sourceFilter = document.getElementById('sourceFilter');
+    const gamesContainer = document.getElementById('gamesContainer');
 
-      const allPlatforms = new Set();
-      const allGenres = new Set();
-
-      function renderGames() {
-        const search = searchInput.value.toLowerCase();
-        const selectedPlatform = platformFilter.value;
-        const selectedGenre = genreFilter.value;
-
-        container.innerHTML = '';
-
-        games.forEach(game => {
-          const name = game.Name || '';
-          const platform = game.Platforms?.[0]?.Name || '';
-          const genres = game.Genres?.map(g => g.Name).join(', ') || '';
-          const source = game.Source?.Name || '';
-          const cover = game.CoverImage || '';
-
-          if (
-            (!search || name.toLowerCase().includes(search)) &&
-            (!selectedPlatform || platform === selectedPlatform) &&
-            (!selectedGenre || genres.includes(selectedGenre))
-          ) {
-            const card = document.createElement('div');
-            card.className = 'game-card';
-            card.innerHTML = `
-              <img src="${cover}" alt="${name}" onerror="this.src='placeholder.jpg'">
-              <h3>${name}</h3>
-              <p><strong>Plataforma:</strong> ${platform}</p>
-              <p><strong>Gênero:</strong> ${genres}</p>
-              <p><strong>Fonte:</strong> ${source}</p>
-            `;
-            container.appendChild(card);
-          }
-        });
-      }
+    function renderFilters(games) {
+      const platforms = new Set();
+      const genres = new Set();
+      const sources = new Set();
 
       games.forEach(game => {
-        if (game.Platforms?.length) {
-          allPlatforms.add(game.Platforms[0].Name);
-        }
-        if (game.Genres?.length) {
-          game.Genres.forEach(g => allGenres.add(g.Name));
-        }
+        game.Platforms?.forEach(p => platforms.add(p.Name));
+        game.Genres?.forEach(g => genres.add(g.Name));
+        if (game.Source?.Name) sources.add(game.Source.Name);
       });
 
-      allPlatforms.forEach(p => {
-        const option = document.createElement('option');
-        option.value = p;
-        option.textContent = p;
-        platformFilter.appendChild(option);
+      platforms.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        platformFilter.appendChild(opt);
       });
 
-      allGenres.forEach(g => {
-        const option = document.createElement('option');
-        option.value = g;
-        option.textContent = g;
-        genreFilter.appendChild(option);
+      genres.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        genreFilter.appendChild(opt);
       });
 
-      platformFilter.addEventListener('change', renderGames);
-      genreFilter.addEventListener('change', renderGames);
-      searchInput.addEventListener('input', renderGames);
-
-      renderGames();
+      sources.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sourceFilter.appendChild(opt);
+      });
     }
 
-    loadGames();
+    function renderGames() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const platformTerm = platformFilter.value;
+      const genreTerm = genreFilter.value;
+      const sourceTerm = sourceFilter.value;
+
+      gamesContainer.innerHTML = '';
+
+      games
+        .filter(game => game.Name.toLowerCase().includes(searchTerm))
+        .filter(game => !platformTerm || (game.Platforms && game.Platforms.some(p => p.Name === platformTerm)))
+        .filter(game => !genreTerm || (game.Genres && game.Genres.some(g => g.Name === genreTerm)))
+        .filter(game => !sourceTerm || (game.Source && game.Source.Name === sourceTerm))
+        .forEach(game => {
+          const gameDiv = document.createElement('div');
+          gameDiv.className = 'game';
+          const img = document.createElement('img');
+          img.src = `./images/${game.CoverImage?.split('\\').pop() || 'placeholder.jpg'}`;
+          img.alt = game.Name;
+          const info = document.createElement('div');
+          info.innerHTML = `
+            <div class="game-title">${game.Name}</div>
+            <div class="game-meta">
+              ${game.Platforms?.map(p => p.Name).join(', ') || 'Plataforma desconhecida'}<br>
+              ${game.Genres?.map(g => g.Name).join(', ') || 'Gênero desconhecido'}<br>
+              Fonte: ${game.Source?.Name || 'Desconhecida'}
+            </div>
+          `;
+          gameDiv.appendChild(img);
+          gameDiv.appendChild(info);
+          gamesContainer.appendChild(gameDiv);
+        });
+    }
+
+    searchInput.addEventListener('input', renderGames);
+    platformFilter.addEventListener('change', renderGames);
+    genreFilter.addEventListener('change', renderGames);
+    sourceFilter.addEventListener('change', renderGames);
+
+    fetch('games.json')
+      .then(res => res.json())
+      .then(data => {
+        games.push(...data);
+        renderFilters(games);
+        renderGames();
+      });
