@@ -15,7 +15,7 @@ fetch('games.json')
         img.src = game.CoverImage;
         img.alt = game.Name;
       } else {
-        img.src = 'https://via.placeholder.com/160x220?text=Sem+Capa';
+        img.src = 'https://placehold.co/160x220';
         img.alt = 'Capa não disponível';
       }
 
