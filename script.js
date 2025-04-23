@@ -78,8 +78,8 @@
     genreFilter.addEventListener('change', renderGames);
     sourceFilter.addEventListener('change', renderGames);
 
-    // fetch('games.json')
-    fetch('https://raw.githubusercontent.com/wellfsilva/meusjogos/refs/heads/main/games.json')
+    fetch('games.json')
+    // fetch('https://raw.githubusercontent.com/wellfsilva/meusjogos/refs/heads/main/games.json')
       .then(res => res.json())
       .then(data => {
         games.push(...data);
