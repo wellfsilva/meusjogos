@@ -1,1 +1,35 @@
+name: Atualizar Capas dos Jogos
+
+on:
+  workflow_dispatch:
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Executar script de atualização
+        env:
+          IGDB_CLIENT_ID: ${{ secrets.IGDB_CLIENT_ID }}
+          IGDB_ACCESS_TOKEN: ${{ secrets.IGDB_ACCESS_TOKEN }}
+        run: |
+          python atualizar_capas_igdb.py
+
+      - name: Commit & Push do arquivo atualizado
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add games_atualizado_com_capas.json
+          git commit -m "Atualiza capas com IGDB" || echo "Sem mudanças"
+          git push
 
