@@ -12,7 +12,7 @@ fetch('games.json')
 
       const img = document.createElement('img');
       if (game.CoverImage) {
-        img.src = game.CoverImage;
+       // img.src = game.CoverImage;
         img.alt = game.Name;
       } else {
         img.src = 'https://placehold.co/160x220';
