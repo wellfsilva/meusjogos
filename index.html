@@ -7,7 +7,17 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Meus Jogos</h1>
+  <h1>Minha Biblioteca de Jogos</h1>
+
+  <div class="filtros">
+    <input type="text" id="searchInput" placeholder="Buscar por nome...">
+    <select id="plataformaSelect">
+      <option value="">Todas as plataformas</option>
+    </select>
+    <select id="generoSelect">
+      <option value="">Todos os gêneros</option>
+    </select>
+  </div>
   <div id="games-container"></div>
 
   <script src="script.js"></script>
