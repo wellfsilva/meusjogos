@@ -9,17 +9,20 @@
 <body>
   <h1>Minha Biblioteca de Jogos</h1>
 
- <div class="filters">
-    <input type="text" id="searchInput" placeholder="Buscar jogo...">
+  <div class="filters">
+    <input type="text" id="searchInput" placeholder="Buscar por nome...">
     <select id="platformFilter">
-      <option value="">Todas as Plataformas</option>
+      <option value="">Todas as plataformas</option>
     </select>
     <select id="genreFilter">
-      <option value="">Todos os Gêneros</option>
+      <option value="">Todos os gêneros</option>
+    </select>
+    <select id="sourceFilter">
+      <option value="">Todas as fontes</option>
     </select>
   </div>
 
-  <div id="gamesContainer" class="games-grid"></div>
+  <div id="gamesContainer"></div>
 
   <script src="script.js"></script>
 </body>
