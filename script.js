@@ -62,9 +62,9 @@
           info.innerHTML = `
             <div class="game-title">${game.Name}</div>
             <div class="game-meta">
-              ${game.Platforms?.map(p => p.Name).join(', ') || 'Plataforma desconhecida'}<br>
-              ${game.Genres?.map(g => g.Name).join(', ') || 'Gênero desconhecido'}<br>
-              Fonte: ${game.Source?.Name || 'Desconhecida'}
+              <b>Plataforma:</b> ${game.Platforms?.map(p => p.Name).join(', ') || 'Plataforma desconhecida'}<br>
+              <b>Gênero:</b> ${game.Genres?.map(g => g.Name).join(', ') || 'Gênero desconhecido'}<br>
+              <b>Loja:</b> ${game.Source?.Name || 'Desconhecida'}
             </div>
           `;
           gameDiv.appendChild(img);
@@ -78,7 +78,8 @@
     genreFilter.addEventListener('change', renderGames);
     sourceFilter.addEventListener('change', renderGames);
 
-    fetch('games.json')
+    // fetch('games.json')
+    fetch('https://raw.githubusercontent.com/wellfsilva/meusjogos/refs/heads/main/games.json')
       .then(res => res.json())
       .then(data => {
         games.push(...data);
